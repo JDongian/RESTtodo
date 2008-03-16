@@ -61,15 +61,51 @@
       <div class="row">
         <div class="col-md-4">
           <h2>/api/schedule/full</h2>
-          <p>Endpoint that fetches data from the PostgreSQL database, returning all schedule items that match the logged in user.<p>
+          <p>Endpoint that fetches data from the PostgreSQL database, returning all schedule items that match the logged in user, checks user login state.<p>
           <p><a class="btn btn-default" href="/api/schedule/full" role="button">View response&raquo;</a></p>
         </div>
       </div>
       <div class="row">
         <div class="col-md-4">
           <h2>/api/schedule/single</h2>
-          <p>Endpoint that fetches data from the PostgreSQL database, returning a single schedule item if one matches the logged in user and class title.<p>
+          <p>Not a real endpoint, just a sample endpoint that was never actually needed.<p>
           <p><a class="btn btn-default" href="/api/schedule/single" role="button">View response&raquo;</a></p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h2>/api/schedule/addclass</h2>
+          <p>Adds a class to the PostgreSQL database. Checks user login state.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h2>/api/schedule/delete</h2>
+          <p>Takes in a POST verb referencing a specific schedule item, and deletes it. Not functional in the web client.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h2>/api/login</h2>
+          <p>A user endpoint, validates user login and produces a session token.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h2>/api/validate</h2>
+          <p>A user endpoint, validates session tokens stored in cookies.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h2>/api/adduser</h2>
+          <p>A user endpoint, adds a user with state 1. State is set to 0 when email confirmed.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <h2>/api/confirm</h2>
+          <p>A user endpoint, handles email confirmations and sets user state to 0 if a valid confirmation link is provided.</p>
         </div>
       </div>
       <div class="row">

@@ -70,11 +70,18 @@ def insert_user(c, email, fname, lname, pwdhash):
 
 def insert_schedule(c, username, title, description, days, timeslot):
     c.execute(open(sqldir+"schedule_insert.sql", 'r').read(),
-            {'username': username,
-             'title': title,
-             'description': description,
-             'days': days,
-             'timeslot': timeslot})
+            {'username': username
+            ,'title': title
+            ,'description': description
+            ,'days': days
+            ,'timeslot': timeslot})
+
+def delete_schedule(c, email, title, descr):
+    print email, title, descr
+    c.execute(open(sqldir+"schedule_delete_row.sql", 'r').read(),
+            {'email': email
+            ,'title': title
+            ,'descr': descr})
 
 def fetch_user_all(c):
     c.execute(open(sqldir+"user_selectall.sql", 'r').read())

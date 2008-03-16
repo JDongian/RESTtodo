@@ -92,6 +92,7 @@ function checkLoggedIn() {
            function (data) {
                if(data['status'] == 0) {
                    loginAction();
+                   loadSchedule();
                }
     });
     return false;
@@ -155,15 +156,35 @@ function loadSchedule() {
         if(data['status'] != 0) {
             alert("could not load schedule.");
         } else {
-        data['schedule'].forEach(function(item) { $("#values").append(
-    '<div class="row">\n'+
-    '  <div class="col-md-4">\n'+
-    '    <h2>'+item['title']+'</h2>\n'+
-    '    <p>'+item['description']+'</p>\n'+
-    '    <p>'+item['days']+' '+item['timeslot']+'</p>\n'+
-        //'<p><a class="btn btn-default" href="#" role="button">Edit &raquo;</a></p>'+
-    '  </div>\n'+
-    '</div>');});
+            $("#values").html('');
+            data['schedule'].forEach(function(item) { $("#values").append(
+        '<div class="removable" style="width: 300px">\n'+
+        '  <div class="row" style="float: left; width: 200px">\n'+
+        '    <div class="col-md-4">\n'+
+        '      <h2>'+item['title']+'</h2>\n'+
+        '      <p>'+item['description']+'</p>\n'+
+        '      <p>'+item['days']+' '+item['timeslot']+'</p>\n'+
+            //'<p><a class="btn btn-default" href="#" role="button">Edit &raquo;</a></p>'+
+        '    </div>\n'+
+        '  </div>\n'+
+        '  <div class="rm-btn" style="float: left; width: 80px; margin-top: 20px">Remove</div>\n'+
+        '  <br style="clear: left;" />\n'+
+        '</div>'+
+        '');});
+                $(".rm-btn").click(function() {
+                    var a = $(this).parent().find('h2').html();
+                    var b = $(this).parent().find('p').html();
+                    alert('please no');
+                    $.post("/api/schedule/delete",
+                           {'email': $.cookie('email')
+                           ,'pwd': $.cookie('session')
+                           ,'title': a
+                           ,'description': b},
+                           function(data) {
+                        alert(data['status']);
+                    });
+                    return false;
+                });
         }
     });
 }

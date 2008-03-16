@@ -110,7 +110,6 @@ def get_schedule():
           ,'days': row[2]
           ,'timeslot': row[3]} for row in d], 
          'status': 0}
-        print d
         return jsonify(d)
     else:
         #bad login
@@ -134,6 +133,20 @@ def add_class():
                 request.form['descr'],
                 request.form['days'],
                 request.form['time'])
+        return jsonify({'status': 0})
+    else:
+        #bad login
+        return jsonify({'status': -1})
+
+@app.route('/api/schedule/delete', methods=['POST'])
+def delete_class():
+    if check_login(request.form) == 0:
+        print c, request.form
+        dbtools.delete_schedule(c,
+                request.form['email'],
+                request.form['title'],
+                request.form['descr'])
+        print c, request.form
         return jsonify({'status': 0})
     else:
         #bad login
@@ -197,8 +210,6 @@ def try_net_acc():
         return open("assets/html/new_acc_success.html", 'r').read()
     return 'Account creation failed. If you think this was an error,\
 please email the  administrator.'
-
-
 
 #TODO: write all the other API endpoints.
 
