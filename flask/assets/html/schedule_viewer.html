@@ -155,9 +155,7 @@ function loadSchedule() {
         if(data['status'] != 0) {
             alert("could not load schedule.");
         } else {
-            alert("login ok.");
-        /*
-        data['schedule'].forEach(function(item) {$("#values").append(
+        data['schedule'].forEach(function(item) { $("#values").append(
     '<div class="row">\n'+
     '  <div class="col-md-4">\n'+
     '    <h2>'+item['title']+'</h2>\n'+
@@ -165,8 +163,7 @@ function loadSchedule() {
     '    <p>'+item['days']+' '+item['timeslot']+'</p>\n'+
         //'<p><a class="btn btn-default" href="#" role="button">Edit &raquo;</a></p>'+
     '  </div>\n'+
-    '</div>');})
-    */
+    '</div>');});
         }
     });
 }
@@ -206,6 +203,7 @@ $("#addclass").click(function() {
                        $('#msg').css('margin', '0px');
                    }
         });
+        loadSchedule();
     } else {
         $('#msg').animate({opacity: 0, height: 0}, 0);
         $('#msg').addClass("alert alert-warning")

@@ -49,7 +49,7 @@ def send_acc_create(recipient, name, pwd_hash):
     subject = 'Welcome to your new Classeract account!'
     body = """Hi %s,<br>
 You've created a new account on Classeract! To confirm your account, please follow the URL below:<br>
-<a href=''>flask.jdong.me/api/confirm/?k=%s&email=%s&h=%s&fname=%s&lname=%s</a><br>
+<a href='http://flask.jdong.me/api/confirm/?k=%s&email=%s&h=%s&fname=%s&lname=%s'>confirm account</a><br>
 <br>
 Cheers,<br>
 The Classeract Team
@@ -102,32 +102,16 @@ def page_viewer():
 
 @app.route('/api/schedule/full', methods=['POST'])
 def get_schedule():
-    print 'tried...'
-#JUST A SAMPLE RESPONSE, THE DATABASE WILL BE HOOKED UP LATER.
-    """
-    return jsonify({'schedule': [
-        {'title': "M325K"
-        ,'description': "Discrete Mathematics"
-        ,'days': "MWF"
-        ,'timeslot': "1:00PM-2:00PM"},
-        {'title': "M427K"
-        ,'description': "Differential Equations"
-        ,'days': "MWF"
-        ,'timeslot': "2:00PM-3:00PM"},
-        {'title': "M328K"
-        ,'description': "Intro to Number Theory"
-        ,'days': "MWF"
-        ,'timeslot': "3:00PM-4:00PM"}
-        ]})"""
     if check_login(request.form) == 0:
         d = dbtools.fetch_schedule_by_email(c, request.form['email'])
-        """
-        return jsonify({'schedule':
+        d = {'schedule':
          [{'title': row[0]
           ,'description': row[1]
           ,'days': row[2]
-          ,'timeslot': row[3]} for row in d],
-         'status': 0})"""
+          ,'timeslot': row[3]} for row in d], 
+         'status': 0}
+        print d
+        return jsonify(d)
     else:
         #bad login
         return jsonify({'status': -1, 'schedule': []})
@@ -246,9 +230,9 @@ def create_task():
 def error404(error):
     return jsonify({'error': str(error)})
 
+pwd = getpass("password: ")
 if __name__ == '__main__':
-    pwd = getpass("password: ")
     #The server NEVER has debug on.
     #app.run(debug=False, port=5000)
     #For debugging, the debug option is nice.
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)

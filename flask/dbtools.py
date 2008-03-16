@@ -17,7 +17,7 @@ Options:
 """
 
 import random
-from faker import Faker
+#from faker import Faker
 from docopt import docopt
 import os
 import psycopg2
@@ -116,7 +116,7 @@ def set_user_fresh(c, email):
               {'email': email})
 
 if __name__ == '__main__':
-    f = Faker()
+ #   f = Faker()
     c = get_cursor()
     arguments = docopt(__doc__, version='REST edu 0.1')
     if arguments['init']:
