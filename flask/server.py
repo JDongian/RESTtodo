@@ -17,6 +17,10 @@ def valid_task(json):
 def index():
     return open("assets/html/index.html", 'r').read()
 
+@app.route('/view', methods=['GET'])
+def view_tasks():
+    return open("assets/html/view_all.html", 'r').read()
+
 @app.route('/api/tasks', methods=['GET'])
 def get_tasks():
     return jsonify({'tasks': tasks})
