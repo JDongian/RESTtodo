@@ -1,6 +1,12 @@
+#!/srv/JDong.me/RESTtodo/venv/bin/python
+
+import os
 from flask import *#Flask, jsonify
 
-app = Flask(__name__)
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          '../flask/assets')
+print ASSETS_DIR
+app = Flask(__name__, template_folder=ASSETS_DIR, static_folder=ASSETS_DIR)
 
 #ordered list of tasks, to be replaced with database.
 tasks = {
@@ -42,4 +48,4 @@ def create_task():
         abort(400)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=80)
+    app.run(debug=True, port=5000)
