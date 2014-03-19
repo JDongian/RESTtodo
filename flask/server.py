@@ -15,7 +15,7 @@ def valid_task(json):
 
 @app.route('/', methods=['GET'])
 def index():
-    return make_response("taskmaster.", 200)
+    return open("assets/html/index.html", 'r').read()
 
 @app.route('/api/tasks', methods=['GET'])
 def get_tasks():
@@ -37,10 +37,9 @@ def create_task():
     if valid_task(request.json):
         task = request.json.get('value', "")
         tasks[max(tasks.keys())+1] = task
+        return jsonify({'new_task': task}, 201)
     else:
         abort(400)
-    return jsonify({'new_task': task}, 201)
 
 if __name__ == '__main__':
     app.run(debug=True, port=80)
-
