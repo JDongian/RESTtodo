@@ -51,20 +51,24 @@ def valid_schedule(json):
 #URL routing
 ###
 @app.route('/', methods=['GET'])
-def index():
+def page_index():
     return open("assets/html/index.html", 'r').read()
 
+@app.route('/cs326e', methods=['GET'])
+def page_cs3263():
+    return open("assets/html/cs326e.html", 'r').read()
+
 @app.route('/schedule-planner', methods=['GET'])
-def view_tasks():
+def page_viewer():
     return open("assets/html/schedule_viewer.html", 'r').read()
 
 ###
 #REST API endpoints (myEdu clone)
 ###
-@app.route('/api/schedule', methods=['GET'])
+@app.route('/api/schedule/full', methods=['GET'])
 def get_schedule():
 #JUST A SAMPLE RESPONSE, THE DATABASE WILL BE HOOKED UP LATER.
-    return {[
+    return jsonify({'schedule': [
         {'title': "M325K"
         ,'description': "Discrete Mathematics"
         ,'days': "MWF"
@@ -77,11 +81,17 @@ def get_schedule():
         ,'description': "Intro to Number Theory"
         ,'days': "MWF"
         ,'timeslot': "3:00PM-4:00PM"}
-        ]}
+        ]})
     #return dbtools.get_schedule()
 
-@app.route('/api/schedule', methods=['GET'])
-def get_schedule():
+@app.route('/api/schedule/single', methods=['GET'])
+def get_schedule_item():
+#JUST A SAMPLE RESPONSE, THE DATABASE WILL BE HOOKED UP LATER.
+    return jsonify({'item':
+        {'title': "M325K"
+        ,'description': "Discrete Mathematics"
+        ,'days': "MWF"
+        ,'timeslot': "1:00PM-2:00PM"}})
 
 #TODO: write all the other API endpoints.
 
@@ -115,6 +125,6 @@ def error404(error):
 
 if __name__ == '__main__':
     #The server NEVER has debug on.
-    app.run(debug=False, port=5000)
+    #app.run(debug=False, port=5000)
     #For debugging, the debug option is nice.
-    #app.run(debug=True, port=5000)
+    app.run(debug=True, port=5000)
