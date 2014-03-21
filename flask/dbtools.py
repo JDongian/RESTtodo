@@ -54,6 +54,23 @@ def delete_db(c, user=True, task=True):
     if task:
         c.execute(open(sqldir+"task_delete.sql", 'r').read())
 
+def insert_user(c, email, fname, lname, pwdhash):
+    c.execute(open("user_insert.sql", 'r').read(),
+            {'email': email,
+             'firstname': fname,
+             'lastname': lname,
+             'pwd': pwdhash})
+
+
+def insert_task(c, username, index, title, description, comments, state):
+    c.execute(open("task_insert.sql", 'r').read(),
+            {'username': username,
+             'ord': index,
+             'title': title,
+             'description': description,
+             'comments': comments,
+             'state': state})
+
 if __name__ == '__main__':
     c = get_cursor()
     arguments = docopt(__doc__, version='REST todo 0.1')

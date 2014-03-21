@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS tasks(
- hint_id        serial PRIMARY KEY
-,username       text
+ username       text
 ,ord            int
 ,title          text
 ,description    text
