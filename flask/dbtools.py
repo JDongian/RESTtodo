@@ -2,9 +2,9 @@
 """Postgres database tools for REST API.
 
 Usage:
-    dbtools.py init [--users|--tasks]
-    dbtools.py reset [--users|--tasks]
-    dbtools.py delete [--users|--tasks]
+    dbtools.py init [--users|--schedules]
+    dbtools.py reset [--users|--schedules]
+    dbtools.py delete [--users|--schedules]
     dbtools.py -h | --help
     dbtools.py --version
 
@@ -12,7 +12,7 @@ Options:
     -h --help       Show this screen.
     -v              Show version.
     --users         Only act on the users table.
-    --tasks         Only act on the tasks table.
+    --schedules     Only act on the tasks table.
 """
 
 from docopt import docopt
@@ -42,7 +42,7 @@ def init_db(c, user=True, task=True):
     if user:
         c.execute(open(sqldir+"user_schema.sql", 'r').read())
     if task:
-        c.execute(open(sqldir+"task_schema.sql", 'r').read())
+        c.execute(open(sqldir+"schedule_schema.sql", 'r').read())
 
 def delete_db(c, user=True, task=True):
     """Delete user and todo tables.
@@ -52,7 +52,7 @@ def delete_db(c, user=True, task=True):
     if user:
         c.execute(open(sqldir+"user_delete.sql", 'r').read())
     if task:
-        c.execute(open(sqldir+"task_delete.sql", 'r').read())
+        c.execute(open(sqldir+"schedule_delete.sql", 'r').read())
 
 def insert_user(c, email, fname, lname, pwdhash):
     c.execute(open("user_insert.sql", 'r').read(),
@@ -61,7 +61,7 @@ def insert_user(c, email, fname, lname, pwdhash):
              'lastname': lname,
              'pwd': pwdhash})
 
-
+"""
 def insert_task(c, username, index, title, description, comments, state):
     c.execute(open("task_insert.sql", 'r').read(),
             {'username': username,
@@ -70,14 +70,21 @@ def insert_task(c, username, index, title, description, comments, state):
              'description': description,
              'comments': comments,
              'state': state})
+"""
+
+def get_user():
+    return False
+
+def get_class():
+    c.execute(open("schedule_select.sql", 'r').read(),)
 
 if __name__ == '__main__':
     c = get_cursor()
-    arguments = docopt(__doc__, version='REST todo 0.1')
+    arguments = docopt(__doc__, version='REST edu 0.1')w
     if arguments['init']:
-        init_db(c, arguments['--users'], arguments['--tasks'])
+        init_db(c, arguments['--users'], arguments['--schedule'])
     elif arguments['reset']:
-        delete_db(c, arguments['--users'], arguments['--tasks'])
-        init_db(c, arguments['--users'], arguments['--tasks'])
+        delete_db(c, arguments['--users'], arguments['--schedule'])
+        init_db(c, arguments['--users'], arguments['--schedule'])
     elif arguments['delete']:
-        delete_db(c, arguments['--users'], arguments['--tasks'])
+        delete_db(c, arguments['--users'], arguments['--schedule'])

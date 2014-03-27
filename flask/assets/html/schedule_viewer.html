@@ -57,13 +57,13 @@
     <script>
       $.get("/api/schedule/full", function(data) {
           data['schedule'].forEach(function(item) {$("#values").append(
-'<div class="row">'+
-  '<div class="col-md-4">'+
-    '<h2>'+item['title']+'</h2>'+
-    '<p>'+item['description']+'</p>'+
-    '<p>'+item['days']+' '+item['timeslot']+'</p>'+
+'<div class="row">\n'+
+'  <div class="col-md-4">\n'+
+'    <h2>'+item['title']+'</h2>\n'+
+'    <p>'+item['description']+'</p>\n'+
+'    <p>'+item['days']+' '+item['timeslot']+'</p>\n'+
     //'<p><a class="btn btn-default" href="#" role="button">Edit &raquo;</a></p>'+
-  '</div>'+
+'  </div>\n'+
 '</div>');});
       });
     </script>

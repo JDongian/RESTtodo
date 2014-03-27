@@ -54,10 +54,12 @@ def valid_schedule(json):
 def page_index():
     return open("assets/html/index.html", 'r').read()
 
+#The demo page for the first showing
 @app.route('/cs326e', methods=['GET'])
 def page_cs3263():
     return open("assets/html/cs326e.html", 'r').read()
 
+#View all classes
 @app.route('/schedule-planner', methods=['GET'])
 def page_viewer():
     return open("assets/html/schedule_viewer.html", 'r').read()
