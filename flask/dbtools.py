@@ -5,6 +5,7 @@ Usage:
     dbtools.py init [--users|--schedules]
     dbtools.py reset [--users|--schedules]
     dbtools.py delete [--users|--schedules]
+    dbtools.py sampleadd [--users][--schedules]
     dbtools.py -h | --help
     dbtools.py --version
 
@@ -15,11 +16,17 @@ Options:
     --schedules     Only act on the tasks table.
 """
 
+import random
+from faker import Faker
 from docopt import docopt
 import os
 import psycopg2
 
 sqldir = "/srv/JDong.me/RESTtodo/sql/"
+sqldir = "../sql/"
+
+def hash_pass(p):
+    return hash(p)
 
 def get_cursor(level=0, db="restful", user=os.getlogin()):
     """Returns a cursor connected to the given database using given
@@ -55,36 +62,54 @@ def delete_db(c, user=True, task=True):
         c.execute(open(sqldir+"schedule_delete.sql", 'r').read())
 
 def insert_user(c, email, fname, lname, pwdhash):
-    c.execute(open("user_insert.sql", 'r').read(),
+    c.execute(open(sqldir+"user_insert.sql", 'r').read(),
             {'email': email,
              'firstname': fname,
              'lastname': lname,
              'pwd': pwdhash})
 
-"""
-def insert_task(c, username, index, title, description, comments, state):
-    c.execute(open("task_insert.sql", 'r').read(),
+def insert_schedule(c, username, title, description, days, timeslot):
+    c.execute(open(sqldir+"schedule_insert.sql", 'r').read(),
             {'username': username,
-             'ord': index,
              'title': title,
              'description': description,
-             'comments': comments,
-             'state': state})
-"""
+             'days': days,
+             'timeslot': timeslot})
 
-def get_user():
+def fetch_user_all(c):
+    c.execute(open(sqldir+"user_selectall.sql", 'r').read())
+    return c.fetchall()
+
+def fetch_user(c):
     return False
 
-def get_class():
-    c.execute(open("schedule_select.sql", 'r').read(),)
+def fetch_classes(c, user):
+    c.execute(open(sqldir+"schedule_select.sql", 'r').read(), user)
 
 if __name__ == '__main__':
+    f = Faker()
     c = get_cursor()
-    arguments = docopt(__doc__, version='REST edu 0.1')w
+    arguments = docopt(__doc__, version='REST edu 0.1')
     if arguments['init']:
-        init_db(c, arguments['--users'], arguments['--schedule'])
+        init_db(c, arguments['--users'], arguments['--schedules'])
     elif arguments['reset']:
-        delete_db(c, arguments['--users'], arguments['--schedule'])
-        init_db(c, arguments['--users'], arguments['--schedule'])
+        delete_db(c, arguments['--users'], arguments['--schedules'])
+        init_db(c, arguments['--users'], arguments['--schedules'])
     elif arguments['delete']:
-        delete_db(c, arguments['--users'], arguments['--schedule'])
+        delete_db(c, arguments['--users'], arguments['--schedules'])
+    elif arguments['sampleadd']:
+        if(arguments['--users']):
+            for i in xrange(8):
+                insert_user(c,
+                        f.email(),
+                        f.name().split()[0],
+                        f.name().split()[1],
+                        hash_pass(f.zip_code()))
+        if(arguments['--schedules']):
+            for i in xrange(8):
+                insert_schedule(c,
+                        random.choice([r[0] for r in fetch_user_all(c)]),
+                        random.choice(['M', 'CS'])+str(random.randint(100,900)),
+                        "Some herpy example class",
+                        random.choice(["MWF", "TuTh"]),
+                        "8:00-9:00")

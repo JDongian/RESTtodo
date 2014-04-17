@@ -1,4 +1,4 @@
-INSERT INTO schedule (
+INSERT INTO schedules (
  username
 ,title
 ,description

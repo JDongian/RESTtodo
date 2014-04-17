@@ -4,6 +4,8 @@ import os
 #TODO: remove the star eventually, when we figure out what we actually need.
 from flask import *#Flask, jsonify
 import flask_login
+from getpass import getpass
+import smtplib
 import dbtools
 
 #Have the assets include properly for the HTML files by setting
@@ -12,6 +14,45 @@ ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           '../flask/assets')
 print ASSETS_DIR
 app = Flask(__name__, template_folder=ASSETS_DIR, static_folder=ASSETS_DIR)
+
+
+SMTP_SERVER = 'smtp.gmail.com'
+SMTP_PORT = 587
+sender = 'jdong42@gmail.com'
+
+def send_acc_create(recipient, name, pwd_hash):
+    subject = 'Welcome to your new Classeract account!'
+    body = """Hi %s,<br>
+You've created a new account on Classeract! To confirm your account, please follow the URL below:<br>
+<a href=''>flask.jdong.me/api/confirm/?k=%se=%s&h=%s&fname=%s&lname=%s</a><br>
+<br>
+Cheers,<br>
+The Classeract Team
+""" % ('key', recipient, pwd_hash, name.split()[0], name.split()[1])
+    headers = ["From: classeract@flask.jdong.me",
+            "Subject: " + subject,
+            "To: " + recipient,
+            "MIME-Version: 1.0",
+            "Content-Type: text/html"]
+    headers = "\r\n".join(headers)
+    session = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    session.ehlo()
+    session.starttls()
+    session.ehlo
+    session.login(sender, pwd)
+    session.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
+    #session.quit()
+
+@app.route('/api/adduser', methods=['POST'])
+def email_confirm():
+    send_acc_create(request.form['email'],
+                    request.form['name'],
+                    request.form['pwdhash'])
+
+@app.route('/api/confirm/', methods=['GET'])
+def try_net_acc():
+    print request.form.keys()
+    #dbtools.insert_user(c, email, fname, lname, hash)
 
 """TODO: Set up login-manager for user sessions.
 login_manager = LoginManager()
@@ -53,6 +94,10 @@ def valid_schedule(json):
 @app.route('/', methods=['GET'])
 def page_index():
     return open("assets/html/index.html", 'r').read()
+
+@app.route('/signup', methods=['GET'])
+def page_signup():
+    return open("assets/html/newuser.html", 'r').read()
 
 #The demo page for the first showing
 @app.route('/cs326e', methods=['GET'])
@@ -126,6 +171,7 @@ def error404(error):
     return jsonify({'error': str(error)})
 
 if __name__ == '__main__':
+    pwd = getpass("password: ")
     #The server NEVER has debug on.
     #app.run(debug=False, port=5000)
     #For debugging, the debug option is nice.

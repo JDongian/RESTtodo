@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS schedules(
 ,title          text
 ,description    text
 ,days           text
-,timeslot       time
+,timeslot       text
 );
