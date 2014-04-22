@@ -85,7 +85,6 @@
     <script src="/assets/js/bootstrap.min.js"></script>
     <script>
 checkLoggedIn();
-
 function checkLoggedIn() {
     $.post("/api/validate",
            {email: $.cookie('email'),
@@ -108,7 +107,7 @@ function loginAction() {
         window.location.reload(false);
         return false;
 });
-
+///////////////////
 }
 function errMsg(s) {
     $('#success').animate({opacity: 0, height: 0}, 0);

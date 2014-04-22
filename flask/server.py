@@ -23,6 +23,15 @@ js_maxval = 9007199254740991
 
 c = dbtools.get_cursor()
 
+###
+#Helper functions
+###
+def valid_schedule(json):
+    #TODO: write a real validator
+    if True:
+        return True
+    return False
+
 def secure_hash(d):
     #herp...
     return hash(d)
@@ -35,7 +44,6 @@ def valid_signup(args):
             state = (h[0][0] == long(args['h']))
             return state
     return False
-
 
 def send_acc_create(recipient, name, pwd_hash):
     subject = 'Welcome to your new Classeract account!'
@@ -65,68 +73,6 @@ The Classeract Team
     session.quit()
     return 0
 
-@app.route('/api/adduser', methods=['POST'])
-def email_confirm():
-    h = secure_hash(request.form['pwd'])
-    #Send an Email to the user to confirm account.
-    status = send_acc_create(request.form['email'],
-                             request.form['fname']+' '+request.form['lname'],
-                             h)
-    #Add a database entry for server confirmation.
-    try:
-        dbtools.insert_user(c,
-                            request.form['email'],
-                            request.form['fname'],
-                            request.form['lname'],
-                            h)
-    except:
-        return jsonify({'status': 2})
-    return jsonify({'status': status})
-
-@app.route('/api/confirm/', methods=['GET'])
-def try_net_acc():
-    if valid_signup(request.args):
-        #Validate account state from 1 to 0.
-        dbtools.set_user_fresh(c, request.args['email'])
-        return open("assets/html/new_acc_success.html", 'r').read()
-    return 'Account creation failed. If you think this was an error,\
-please email the  administrator.'
-
-
-"""TODO: Set up login-manager for user sessions.
-login_manager = LoginManager()
-login_manager.init(app)
-
-#Logins
-@login_manager.user_loader
-def load_user(userid):
-    return User.get(userid)
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        login_user(user)
-        flash("Logged in successfully.")
-        return redirect(request.args.get("next") or url_for("index"))
-    return render_template("login.html", form=form)
-"""
-
-###
-#Helper functions
-###
-"""DEPRECATED
-def valid_task(json):
-    if 'value' in json.keys():
-        return True
-    return False
-"""
-def valid_schedule(json):
-    #TODO: write a real validator
-    if True:
-        return True
-    return False
-
 ###
 #URL routing
 ###
@@ -151,6 +97,9 @@ def page_viewer():
 ###
 #REST API endpoints (myEdu clone)
 ###
+
+#SCHEDULE ENDPOINTS
+
 @app.route('/api/schedule/full', methods=['GET'])
 def get_schedule():
 #JUST A SAMPLE RESPONSE, THE DATABASE WILL BE HOOKED UP LATER.
@@ -179,6 +128,13 @@ def get_schedule_item():
         ,'days': "MWF"
         ,'timeslot': "1:00PM-2:00PM"}})
 
+@app.route('/api/schedule/addclass', methods=['POST'])
+def add_class():
+    print request.form
+
+
+#USER ENDPOINTS
+
 @app.route('/api/login', methods=['POST'])
 def validate_login():
     """Takes in a pwd and email arg in the POST form and returns a JSON with
@@ -196,6 +152,35 @@ def check_login():
     if h%js_maxval == long(request.form['pwd']):
         return jsonify({'status': 0})
     return jsonify({'status': -1})
+
+@app.route('/api/adduser', methods=['POST'])
+def email_confirm():
+    h = secure_hash(request.form['pwd'])
+    #Send an Email to the user to confirm account.
+    status = send_acc_create(request.form['email'],
+                             request.form['fname']+' '+request.form['lname'],
+                             h)
+    #Add a database entry for server confirmation.
+    try:
+        dbtools.insert_user(c,
+                            request.form['email'],
+                            request.form['fname'],
+                            request.form['lname'],
+                            h)
+    except:
+        return jsonify({'status': 2})
+    return jsonify({'status': status})
+
+@app.route('/api/confirm/', methods=['GET'])
+def try_net_acc():
+    if valid_signup(request.args):
+        #Validate account state from 1 to 0.
+        dbtools.set_user_fresh(c, request.args['email'])
+        return open("assets/html/new_acc_success.html", 'r').read()
+    return 'Account creation failed. If you think this was an error,\
+please email the  administrator.'
+
+
 
 #TODO: write all the other API endpoints.
 
