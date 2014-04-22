@@ -20,15 +20,31 @@ SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 sender = 'jdong42@gmail.com'
 
+c = dbtools.get_cursor()
+
+def secure_hash(d):
+    #herp...
+    return hash(d)
+
+def valid_signup(args):
+    if args['k'] == 'key':
+        h = dbtools.search_user_by_match(c,
+                args['email'], args['fname'], args['lname'])
+        if len(h) != 0:
+            state = (h[0][0] == long(args['h']))
+            return state
+    return False
+
+
 def send_acc_create(recipient, name, pwd_hash):
     subject = 'Welcome to your new Classeract account!'
     body = """Hi %s,<br>
 You've created a new account on Classeract! To confirm your account, please follow the URL below:<br>
-<a href=''>flask.jdong.me/api/confirm/?k=%se=%s&h=%s&fname=%s&lname=%s</a><br>
+<a href=''>flask.jdong.me/api/confirm/?k=%s&email=%s&h=%s&fname=%s&lname=%s</a><br>
 <br>
 Cheers,<br>
 The Classeract Team
-""" % ('key', recipient, pwd_hash, name.split()[0], name.split()[1])
+""" % (name, 'key', recipient, pwd_hash, name.split()[0], name.split()[1])
     headers = ["From: classeract@flask.jdong.me",
             "Subject: " + subject,
             "To: " + recipient,
@@ -40,19 +56,41 @@ The Classeract Team
     session.starttls()
     session.ehlo
     session.login(sender, pwd)
-    session.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
-    #session.quit()
+    try:
+        session.sendmail(sender, recipient, headers + "\r\n\r\n" + body)
+    except:
+        session.quit()
+        return 1
+    session.quit()
+    return 0
 
 @app.route('/api/adduser', methods=['POST'])
 def email_confirm():
-    send_acc_create(request.form['email'],
-                    request.form['name'],
-                    request.form['pwdhash'])
+    h = secure_hash(request.form['pwd'])
+    #Send an Email to the user to confirm account.
+    status = send_acc_create(request.form['email'],
+                             request.form['fname']+' '+request.form['lname'],
+                             h)
+    #Add a database entry for server confirmation.
+    try:
+        dbtools.insert_user(c,
+                            request.form['email'],
+                            request.form['fname'],
+                            request.form['lname'],
+                            h)
+    except:
+        return jsonify({'status': 2})
+    return jsonify({'status': status})
 
 @app.route('/api/confirm/', methods=['GET'])
 def try_net_acc():
-    print request.form.keys()
-    #dbtools.insert_user(c, email, fname, lname, hash)
+    if valid_signup(request.args):
+        #Validate account state from 1 to 0.
+        dbtools.set_user_fresh(c, request.args['email'])
+        return open("assets/html/new_acc_success.html", 'r').read()
+    return 'Account creation failed. If you think this was an error,\
+please email the  administrator.'
+
 
 """TODO: Set up login-manager for user sessions.
 login_manager = LoginManager()

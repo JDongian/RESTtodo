@@ -3,9 +3,11 @@ INSERT INTO users (
 ,firstname
 ,lastname
 ,pwd
+,status
 ) VALUES (
  %(email)s
-,%(firstname)s
-,%(lastname)s
+,%(fname)s
+,%(lname)s
 ,%(pwd)s
+,1
 );

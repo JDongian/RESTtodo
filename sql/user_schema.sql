@@ -3,4 +3,5 @@ CREATE TABLE IF NOT EXISTS users(
 ,firstname  text
 ,lastname   text
 ,pwd        bigint
+,status     int
 );

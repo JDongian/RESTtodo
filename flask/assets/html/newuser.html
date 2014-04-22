@@ -71,42 +71,67 @@
           </button>
           <a class="navbar-brand" href="/">Classeract</a>
         </div>
-        <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control" id='email_val'>
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control" id='pwd_val'>
-            </div>
-            <button type="submit" class="btn btn-success" id="login">Sign in</button>
-            <button type="submit" class="btn btn-success" id="newuser">Sign up!</button>
-          </form>
-        </div>
       </div>
     </div>
 
     <div class="container" style="margin-top: 60px">
-        <form class="form-signin">
+        <div id="success">
+        </div>
+        <div id="invalid">
+        </div>
+        <form id="acc_form" class="form-signin">
             <h2 class="form-signin-heading">New Account</h2>
-            <input type="text" class="input-block-level" placeholder="Email address"><br>
-            <input type="text" class="input-block-level" placeholder="Name"><br>
-            <input type="password" class="input-block-level" placeholder="Password"><br>
-            <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+            <input id="form_email" type="text" class="input-block-level" placeholder="Email address"><br>
+            <input id="form_fname" type="text" class="input-block-level" placeholder="First name"><br>
+            <input id="form_lname" type="text" class="input-block-level" placeholder="Last name"><br>
+            <input id="form_pwd" type="password" class="input-block-level" placeholder="Password"><br>
+            <button id="newuser" class="btn btn-large btn-primary" type="submit">Create!</button>
         </form>
-
     </div>
-
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>
     <script>
-$("#newuser").click(function() {
-        alert("new user.");
-        $.post("/api/adduser", {'email': 'herp@derp.com', 'pwd': '12345'}, function(data) {
-            alert(data);
-        });
-});
+    $("#newuser").click(function() {
+        if ($("#form_email").val() &&
+            $("#form_fname").val() &&
+            $("#form_lname").val() &&
+            $("#form_pwd").val()) {
+            $.post("/api/adduser",
+                   {'email': $("#form_email").val(),
+                    'fname': $("#form_fname").val(),
+                    'lname': $("#form_lname").val(),
+                    'pwd': $("#form_pwd").val()},
+                function(data) {
+                    if(data['status'] == 0) {
+                        $('#invalid').animate({opacity: 0, height: 0}, 0);
+                        $('#acc_form').animate({opacity: 'toggle', height: 'toggle'}, 1000);
+                        $('#success').animate({opacity: 'toggle', height: 'toggle'}, 0);
+                        $('#success').addClass("alert alert-success")
+                        $('#success').html("<p><b>Success!</b> "+
+                            "Check your email to confirm your new account!</p>");
+                        $('#success').animate({opacity: 'toggle', height: 'toggle'}, 1400);
+                    } else if(data['status'] == 2) {
+                        $('#invalid').animate({opacity: 0, height: 0}, 0);
+                        $('#invalid').addClass("alert alert-danger")
+                        $('#invalid').html("<p><b>Whoops!</b> "+
+                            "We already sent you an email, or you already have an account.</p>");
+                        $('#invalid').animate({opacity: 100, height: "3em"}, 1000);
+                    } else {
+                        $('#invalid').animate({opacity: 0, height: 0}, 0);
+                        $('#invalid').addClass("alert alert-danger")
+                        $('#invalid').html("<p><b>Whoops!</b> "+
+                            "Check that email field.</p>");
+                        $('#invalid').animate({opacity: 100, height: "3em"}, 1000);
+                    }
+            });
+        } else {
+            $('#invalid').animate({opacity: 0, height: 0}, 0);
+            $('#invalid').addClass("alert alert-danger")
+            $('#invalid').html("<p><b>Whoops!</b> Did you forget something?</p>");
+            $('#invalid').animate({opacity: 100, height: "3em"}, 1000)
+        }
+        return false;
+    });
     </script>
   </body>
 </html>

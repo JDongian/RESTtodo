@@ -62,11 +62,12 @@ def delete_db(c, user=True, task=True):
         c.execute(open(sqldir+"schedule_delete.sql", 'r').read())
 
 def insert_user(c, email, fname, lname, pwdhash):
-    c.execute(open(sqldir+"user_insert.sql", 'r').read(),
-            {'email': email,
-             'firstname': fname,
-             'lastname': lname,
-             'pwd': pwdhash})
+    data = {'email': email,
+            'fname': fname,
+            'lname': lname,
+            'pwd': pwdhash}
+    print data
+    return c.execute(open(sqldir+"user_insert.sql", 'r').read(), data)
 
 def insert_schedule(c, username, title, description, days, timeslot):
     c.execute(open(sqldir+"schedule_insert.sql", 'r').read(),
@@ -80,11 +81,22 @@ def fetch_user_all(c):
     c.execute(open(sqldir+"user_selectall.sql", 'r').read())
     return c.fetchall()
 
+def search_user_by_match(c, email, fname, lname):
+    c.execute(open(sqldir+"user_find_by_match.sql", 'r').read(),
+              {'email': email,
+               'fname': fname,
+               'lname': lname})
+    return c.fetchall()
+
 def fetch_user(c):
     return False
 
 def fetch_classes(c, user):
     c.execute(open(sqldir+"schedule_select.sql", 'r').read(), user)
+
+def set_user_fresh(c, email):
+    c.execute(open(sqldir+"user_set_fresh.sql", 'r').read(),
+              {'email': email})
 
 if __name__ == '__main__':
     f = Faker()
