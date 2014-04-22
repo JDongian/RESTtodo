@@ -19,6 +19,7 @@ app = Flask(__name__, template_folder=ASSETS_DIR, static_folder=ASSETS_DIR)
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 sender = 'jdong42@gmail.com'
+js_maxval = 9007199254740991
 
 c = dbtools.get_cursor()
 
@@ -177,6 +178,24 @@ def get_schedule_item():
         ,'description': "Discrete Mathematics"
         ,'days': "MWF"
         ,'timeslot': "1:00PM-2:00PM"}})
+
+@app.route('/api/login', methods=['POST'])
+def validate_login():
+    """Takes in a pwd and email arg in the POST form and returns a JSON with
+    the key 'status' holding the result of the login.
+    """
+    h = secure_hash(request.form['pwd'])
+    if dbtools.user_valid_login(c, request.form['email'], h):
+        return jsonify({'status': h%js_maxval})
+    return jsonify({'status': -1})
+
+@app.route('/api/validate', methods=['POST'])
+def check_login():
+    h = dbtools.search_user_by_email(c,
+            {'email': request.form['email']})[0][3]
+    if h%js_maxval == long(request.form['pwd']):
+        return jsonify({'status': 0})
+    return jsonify({'status': -1})
 
 #TODO: write all the other API endpoints.
 

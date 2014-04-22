@@ -1,4 +1,2 @@
-SELECT * FROM users WHERE
- email=%(email)s
-,firstname=%(fname)
-,lastname=%(lname);
+SELECT email, firstname, lastname, pwd, status FROM users WHERE
+ email=%(email)s;

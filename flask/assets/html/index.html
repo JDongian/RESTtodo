@@ -37,19 +37,24 @@
           </button>
           <a class="navbar-brand" href="/">Classeract</a>
         </div>
-        <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control" id='email_val'>
-            </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control" id='pwd_val'>
-            </div>
-            <button type="submit" class="btn btn-success" id="login">Sign in</button>
-            <button type="submit" class="btn btn-success" id="newuser">Sign up!</button>
-          </form>
+        <div id="login-bar">
+          <div class="navbar-collapse collapse">
+            <form class="navbar-form navbar-right" role="form">
+              <div class="form-group">
+                <input type="text" placeholder="Email" class="form-control" id='email_val'>
+              </div>
+              <div class="form-group">
+                <input type="password" placeholder="Password" class="form-control" id='pwd_val'>
+              </div>
+              <button type="submit" class="btn btn-success" id="login">Sign in</button>
+              <button type="submit" class="btn btn-success" id="newuser">Sign up!</button>
+            </form>
+          </div>
         </div>
       </div>
+    </div>
+    <div style="height: 4em"></div>
+    <div id="success" style="margin: 2em">
     </div>
     <div class="jumbotron">
       <div class="container">
@@ -76,19 +81,70 @@
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="/assets/js/jquery.cookie.js"></script>
     <script src="/assets/js/bootstrap.min.js"></script>
     <script>
+checkLoggedIn();
+
+function checkLoggedIn() {
+    $.post("/api/validate",
+           {email: $.cookie('email'),
+            pwd: $.cookie('session')},
+           function (data) {
+               if(data['status'] == 0) {
+                   loginAction();
+               }
+    });
+    return false;
+}
+function loginAction() {
+    $("#login-bar").html('<div class="navbar-collapse collapse">'+
+  '<form class="navbar-form navbar-right" role="form">'+
+    '<button id="logout" type="submit" class="btn btn-success" >Log out</button>'+
+  '</div>'+
+'</div>');
+    $("#logout").click(function(){
+        clearLoginCookies();
+        window.location.reload(false);
+        return false;
+});
+
+}
+function errMsg(s) {
+    $('#success').animate({opacity: 0, height: 0}, 0);
+    $('#success').addClass("alert alert-danger")
+    $('#success').html("<p><b>Whoops!</b> "+s);
+    $('#success').animate({opacity: 100, height: "4em"}, 1000);
+}
+function setLogin(e, c) {
+    //Shh...!
+    $.cookie('email', e, { expires: 1, path: '/' });
+    $.cookie('session', c, { expires: 1, path: '/' });
+    return;
+}
 $("#newuser").click(function() {
         window.location = "/signup";
         return false;
 });
+function clearLoginCookies() {
+    $.removeCookie('email');
+    $.removeCookie('session');
+}
 $("#login").click(function() {
-    $.post("login",
-           {uname: $("#email_val"), pwd: $("#pwd_val")},
+    $.post("/api/login",
+           {email: $("#email_val").val(),
+            pwd: $("#pwd_val").val()},
            function(data) {
-        window.location = "http://stackoverflow.com";
+               var code = data['status'];
+               //alert(code);
+               if(code == -1) {
+                   errMsg("Invalid login.");
+               } else {
+                   setLogin($("#email_val").val(), code);
+                   checkLoggedIn();
+               }
     });
-        return false;
+    return false;
 });
     </script>
   </body>

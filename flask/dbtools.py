@@ -66,7 +66,6 @@ def insert_user(c, email, fname, lname, pwdhash):
             'fname': fname,
             'lname': lname,
             'pwd': pwdhash}
-    print data
     return c.execute(open(sqldir+"user_insert.sql", 'r').read(), data)
 
 def insert_schedule(c, username, title, description, days, timeslot):
@@ -86,6 +85,19 @@ def search_user_by_match(c, email, fname, lname):
               {'email': email,
                'fname': fname,
                'lname': lname})
+    return c.fetchall()
+
+def user_valid_login(c, email, hash):
+    c.execute(open(sqldir+"user_find_by_login.sql", 'r').read(),
+              {'email': email,
+               'hash': hash})
+    status = len(c.fetchall())
+    if status > 1:
+        print "ERROR?"
+    return status == 1
+
+def search_user_by_email(c, email):
+    c.execute(open(sqldir+"user_find_by_email.sql", 'r').read(), email)
     return c.fetchall()
 
 def fetch_user(c):
