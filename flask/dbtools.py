@@ -80,6 +80,11 @@ def fetch_user_all(c):
     c.execute(open(sqldir+"user_selectall.sql", 'r').read())
     return c.fetchall()
 
+def fetch_schedule_by_email(c, e):
+    c.execute(open(sqldir+"schedule_find_by_email.sql", 'r').read(),
+              {'email': e})
+    return c.fetchall()
+
 def search_user_by_match(c, email, fname, lname):
     c.execute(open(sqldir+"user_find_by_match.sql", 'r').read(),
               {'email': email,

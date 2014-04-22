@@ -100,9 +100,11 @@ def page_viewer():
 
 #SCHEDULE ENDPOINTS
 
-@app.route('/api/schedule/full', methods=['GET'])
+@app.route('/api/schedule/full', methods=['POST'])
 def get_schedule():
+    print 'tried...'
 #JUST A SAMPLE RESPONSE, THE DATABASE WILL BE HOOKED UP LATER.
+    """
     return jsonify({'schedule': [
         {'title': "M325K"
         ,'description': "Discrete Mathematics"
@@ -116,8 +118,19 @@ def get_schedule():
         ,'description': "Intro to Number Theory"
         ,'days': "MWF"
         ,'timeslot': "3:00PM-4:00PM"}
-        ]})
-    #return dbtools.get_schedule()
+        ]})"""
+    if check_login(request.form) == 0:
+        d = dbtools.fetch_schedule_by_email(c, request.form['email'])
+        """
+        return jsonify({'schedule':
+         [{'title': row[0]
+          ,'description': row[1]
+          ,'days': row[2]
+          ,'timeslot': row[3]} for row in d],
+         'status': 0})"""
+    else:
+        #bad login
+        return jsonify({'status': -1, 'schedule': []})
 
 @app.route('/api/schedule/single', methods=['GET'])
 def get_schedule_item():
@@ -130,8 +143,17 @@ def get_schedule_item():
 
 @app.route('/api/schedule/addclass', methods=['POST'])
 def add_class():
-    print request.form
-
+    if check_login(request.form) == 0:
+        dbtools.insert_schedule(c,
+                request.form['email'],
+                request.form['title'],
+                request.form['descr'],
+                request.form['days'],
+                request.form['time'])
+        return jsonify({'status': 0})
+    else:
+        #bad login
+        return jsonify({'status': -1})
 
 #USER ENDPOINTS
 
@@ -146,12 +168,24 @@ def validate_login():
     return jsonify({'status': -1})
 
 @app.route('/api/validate', methods=['POST'])
-def check_login():
+def check_login(f=None):
+    if f:
+        e = f['email']
+        p = f['pwd']
+    else:
+        e = request.form['email']
+        p = request.form['pwd']
     h = dbtools.search_user_by_email(c,
-            {'email': request.form['email']})[0][3]
-    if h%js_maxval == long(request.form['pwd']):
-        return jsonify({'status': 0})
-    return jsonify({'status': -1})
+            {'email': e})[0][3]
+    if h%js_maxval == long(p):
+        if f:
+            return 0
+        else:
+            return jsonify({'status': 0})
+    if f:
+        return -1
+    else:
+        return jsonify({'status': -1})
 
 @app.route('/api/adduser', methods=['POST'])
 def email_confirm():

@@ -65,6 +65,21 @@
       <div id="values" class="container">
       </div>
     </div>
+    <hr>
+    <div id="msg" style="margin: 50px">
+    </div>
+    <div style="margin: 50px; margin-top: 0;">
+      <div class="input-group">
+        <span class="input-group-addon"></span>
+        <input id="class-title" type="text" class="form-control" placeholder="Course Title">
+        <input id="class-descr" type="text" class="form-control" placeholder="Course Description">
+        <input id="class-days" type="text" class="form-control" placeholder="Days">
+        <input id="class-time" type="text" class="form-control" placeholder="Time">
+        <!--<input type="text" class="form-control" placeholder="Notes">--!>
+      </div>
+      <br>
+      <button type="submit" class="btn btn-sm btn-success" id="addclass">Add Class</button>
+    </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="/assets/js/jquery.cookie.js"></script>
@@ -130,18 +145,78 @@ $("#login").click(function() {
     return false;
 });
 //////////////
-      $.get("/api/schedule/full", function(data) {
-          data['schedule'].forEach(function(item) {$("#values").append(
-'<div class="row">\n'+
-'  <div class="col-md-4">\n'+
-'    <h2>'+item['title']+'</h2>\n'+
-'    <p>'+item['description']+'</p>\n'+
-'    <p>'+item['days']+' '+item['timeslot']+'</p>\n'+
-    //'<p><a class="btn btn-default" href="#" role="button">Edit &raquo;</a></p>'+
-'  </div>\n'+
-'</div>');});
-      });
+loadSchedule();
+function loadSchedule() {
+    $("#values").html('');
+    $.post("/api/schedule/full",
+           {'email': $.cookie('email')
+           ,'pwd': $.cookie('session')},
+    function(data) {
+        if(data['status'] != 0) {
+            alert("could not load schedule.");
+        } else {
+            alert("login ok.");
+        /*
+        data['schedule'].forEach(function(item) {$("#values").append(
+    '<div class="row">\n'+
+    '  <div class="col-md-4">\n'+
+    '    <h2>'+item['title']+'</h2>\n'+
+    '    <p>'+item['description']+'</p>\n'+
+    '    <p>'+item['days']+' '+item['timeslot']+'</p>\n'+
+        //'<p><a class="btn btn-default" href="#" role="button">Edit &raquo;</a></p>'+
+    '  </div>\n'+
+    '</div>');})
+    */
+        }
+    });
+}
+$("#addclass").click(function() {
+    var formData = [$("#class-title").val()
+    ,$("#class-descr").val()
+    ,$("#class-days").val()
+    ,$("#class-time").val()];
+    if(formData[0] && formData[1] && formData[2] && formData[3]) {
+        $.post('/api/schedule/addclass',
+               {'email': $.cookie('email')
+               ,'pwd': $.cookie('session')
+               ,'title': $("#class-title").val()
+               ,'descr': $("#class-descr").val()
+               ,'days': $("#class-days").val()
+               ,'time': $("#class-time").val()},
+               function(data) {
+                   if(data['status'] == 0) {
+                       $("#class-title").val('');
+                       $("#class-descr").val('');
+                       $("#class-days").val('');
+                       $("#class-time").val('');
+                       $('#msg').animate({opacity: 0, height: 0}, 0);
+                       $('#msg').css('margin', '9px');
+                       $('#msg').addClass("alert alert-success")
+                       $('#msg').html("<p><b>Success!</b> Added new class.");
+                       $('#msg').animate({opacity: 100, height: "4em"}, 1000);
+                       $('#msg').animate({opacity: 0, height: 0, margin: 0}, 1000);
+                       $('#msg').css('margin', '0px');
+                   } else {
+                       $('#msg').animate({opacity: 0, height: 0}, 0);
+                       $('#msg').css('margin', '9px');
+                       $('#msg').addClass("alert alert-warning")
+                       $('#msg').html("<p><b>Whoops!</b> Class could not be added.");
+                       $('#msg').animate({opacity: 100, height: "4em"}, 1000);
+                       $('#msg').animate({opacity: 0, height: 0, margin: 0}, 1000);
+                       $('#msg').css('margin', '0px');
+                   }
+        });
+    } else {
+        $('#msg').animate({opacity: 0, height: 0}, 0);
+        $('#msg').addClass("alert alert-warning")
+        $('#msg').html("<p><b>Whoops!</b> Missing field.");
+        $('#msg').animate({opacity: 100, height: "4em"}, 1000);
+        $('#msg').animate({opacity: 0, height: 0}, 1000);
+    }
+    return false;
+});
     </script>
     <script src="/assets/js/bootstrap.min.js"></script>
+    <script src="/assets/js/jquery.cookie.js"></script>
   </body>
 </html>
